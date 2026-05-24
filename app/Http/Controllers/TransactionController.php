@@ -15,7 +15,24 @@ class TransactionController extends BaseController
 
     public function list(Request $request)
     {
+        $transactions = [
+            [
+                'date' => '2026-05-24',
+                'description' => 'Salary',
+                'category' => 'Income',
+                'type' => 'income',
+                'amount' => 3500,
+            ],
+            [
+                'date' => '2026-05-24',
+                'description' => 'Lunch',
+                'category' => 'Food',
+                'type' => 'expense',
+                'amount' => 15.50,
+            ],
+        ];
 
+        return view('transactions', compact('transactions'));
     }
 
 }

@@ -9,7 +9,7 @@ Route::post('/login_process', [AuthController::class, 'login_process'])->name('l
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TransactionController::class, 'list'])->name('transaction.list');
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::any('/logout', [AuthController::class, 'logout'])->name('logout');
 
 });
 

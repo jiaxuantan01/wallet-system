@@ -33,7 +33,7 @@ class AuthController extends BaseController
                 'last_login_ip' => $request->ip()
             ]);
 
-            return redirect()->route('membership.list');
+            return redirect()->route('transaction.list');
         }
 
         return back()->with('error','Invalid username or password');
