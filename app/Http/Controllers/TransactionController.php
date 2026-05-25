@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -30,35 +31,74 @@ class TransactionController extends Controller
             'amount'    => 'required|numeric|min:1',
         ]);
 
-        $now = now();
-        $wallet = Wallet::find($request->wallet_id);
+        return DB::transaction(function () use ($request) {
 
-        if (!$wallet) {
+            $now = now();
+
+            $wallet = Wallet::where('id', $request->wallet_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$wallet) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Wallet not found'
+                ], 404);
+            }
+
+            $wallet->balance += $request->amount;
+            $wallet->save();
+
+            Transaction::create([
+                'wallet_id'  => $wallet->id,
+                'type'       => 'deposit',
+                'amount'     => $request->amount,
+                'created_at' => $now,
+            ]);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Wallet not found'
-            ], 404);
-        }
+                'success'     => true,
+                'balance'     => $wallet->balance,
+            ]);
+        });
+    }
 
-        // update wallet balance
-        $wallet->balance += $request->amount;
-        $wallet->save();
-
-        // create transaction record
-        $transaction = Transaction::create([
-            'wallet_id'  => $wallet->id,
-            'type'       => 'deposit',
-            'amount'     => $request->amount,
-            'created_at' => $now,
+    public function withdrawal(Request $request)
+    {
+        $request->validate([
+            'wallet_id' => 'required|integer',
+            'amount'    => 'required|numeric|min:1',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Deposit successful',
-            'data' => [
-                'wallet_balance' => $wallet->balance,
-                'transaction'    => $transaction,
-            ]
-        ]);
+        return DB::transaction(function () use ($request) {
+
+            $now = now();
+
+            $wallet = Wallet::where('id', $request->wallet_id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($wallet->balance < $request->amount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Insufficient balance'
+                ], 400);
+            }
+
+            $wallet->balance -= $request->amount;
+            $wallet->save();
+
+            Transaction::create([
+                'wallet_id'  => $wallet->id,
+                'type'       => 'withdrawal',
+                'amount'     => $request->amount,
+                'created_at' => $now,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'balance' => $wallet->balance
+            ]);
+        });
     }
 }

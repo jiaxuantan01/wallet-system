@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/deposit', [App\Http\Controllers\TransactionController::class, 'deposit']);
+Route::post('/withdrawal', [App\Http\Controllers\TransactionController::class, 'withdrawal']);
