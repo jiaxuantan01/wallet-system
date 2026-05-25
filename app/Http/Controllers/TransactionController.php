@@ -11,13 +11,9 @@ class TransactionController extends Controller
 {
     public function list(Request $request)
     {
-        $transactions = Transaction::select(
-            'id',
-            'wallet_id',
-            'type',
-            'amount',
-            'created_at'
-        )
+        $transactions = Transaction::with([
+            'wallet.account'
+        ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -33,8 +29,6 @@ class TransactionController extends Controller
 
         return DB::transaction(function () use ($request) {
 
-            $now = now();
-
             $wallet = Wallet::where('id', $request->wallet_id)
                 ->lockForUpdate()
                 ->first();
@@ -46,19 +40,31 @@ class TransactionController extends Controller
                 ], 404);
             }
 
-            $wallet->balance += $request->amount;
-            $wallet->save();
+            // deposit
+            $amount = (float) $request->amount;
+            $wallet->balance += $amount;
 
             Transaction::create([
-                'wallet_id'  => $wallet->id,
-                'type'       => 'deposit',
-                'amount'     => $request->amount,
-                'created_at' => $now,
+                'wallet_id' => $wallet->id,
+                'type'      => 'deposit',
+                'amount'    => $amount,
             ]);
 
+            // rebate
+            $rebate = $amount * 0.01;
+            $wallet->balance += $rebate;
+
+            Transaction::create([
+                'wallet_id' => $wallet->id,
+                'type'      => 'rebate',
+                'amount'    => $rebate,
+            ]);
+
+            $wallet->save();
+
             return response()->json([
-                'success'     => true,
-                'balance'     => $wallet->balance,
+                'success' => true,
+                'balance' => number_format($wallet->balance,2)
             ]);
         });
     }
@@ -97,7 +103,7 @@ class TransactionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'balance' => $wallet->balance
+                'balance' => number_format($wallet->balance,2)
             ]);
         });
     }

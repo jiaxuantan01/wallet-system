@@ -18,4 +18,19 @@ class Wallet extends Authenticatable
         'updated_at',
     ];
 
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function getBalance($wallet_id){
+
+        return self::where('id', $wallet_id)->balance;
+
+    }
 }

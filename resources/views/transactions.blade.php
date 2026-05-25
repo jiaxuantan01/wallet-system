@@ -93,9 +93,10 @@
 
 <body>
 <div class="page">
+
     <div class="header">
         <h1>Transactions List</h1>
-        <a href="#" class="add-btn">+ Add Transaction</a>
+{{--        <a href="#" class="add-btn">+ Add Transaction</a>--}}
     </div>
 
     <div class="card">
@@ -104,6 +105,7 @@
             <tr>
                 <th>ID</th>
                 <th>Date</th>
+                <th>Username</th>
                 <th>Wallet ID</th>
                 <th>Type</th>
                 <th>Amount</th>
@@ -113,17 +115,12 @@
             <tbody>
             @foreach($transactions as $transaction)
                 <tr>
-                    <td>{{ $transaction['id'] }}</td>
-
-                    <td>{{ $transaction['created_at'] }}</td>
-
-                    <td>{{ $transaction['wallet_id'] }}</td>
-
-                    <td>{{ ucfirst($transaction['type']) }}</td>
-
-                    <td class="amount {{ $transaction['type'] }}">
-                        {{ number_format($transaction['amount'], 2) }}
-                    </td>
+                    <td>{{ $transaction->id }}</td>
+                    <td>{{ $transaction->created_at }}</td>
+                    <td>{{ $transaction->wallet->account->username ?? '-' }}</td>
+                    <td>{{ $transaction->wallet_id }}</td>
+                    <td>{{ ucfirst($transaction->type) }}</td>
+                    <td class="amount {{ $transaction->type }}">{{ number_format($transaction->amount, 2) }}</td>
                 </tr>
             @endforeach
             </tbody>
