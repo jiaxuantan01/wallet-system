@@ -2,37 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Validation\ValidatesRequests;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Transaction;
 
-class TransactionController extends BaseController
+class TransactionController extends Controller
 {
-    use AuthorizesRequests, ValidatesRequests;
-
-
     public function list(Request $request)
     {
-        $transactions = [
-            [
-                'date' => '2026-05-24',
-                'description' => 'Salary',
-                'category' => 'Income',
-                'type' => 'income',
-                'amount' => 3500,
-            ],
-            [
-                'date' => '2026-05-24',
-                'description' => 'Lunch',
-                'category' => 'Food',
-                'type' => 'expense',
-                'amount' => 15.50,
-            ],
-        ];
+        $transactions = Transaction::select(
+            'id',
+            'wallet_id',
+            'type',
+            'amount',
+            'created_at'
+        )
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('transactions', compact('transactions'));
     }
 
+    public function deposit(Request $request)
+    {
+        $request->validate([
+            'wallet_id' => 'required|integer',
+            'amount'    => 'required|numeric|min:1',
+        ]);
+
+        $now = now();
+        $wallet = Wallet::find($request->wallet_id);
+
+        if (!$wallet) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Wallet not found'
+            ], 404);
+        }
+
+        // update wallet balance
+        $wallet->balance += $request->amount;
+        $wallet->save();
+
+        // create transaction record
+        $transaction = Transaction::create([
+            'wallet_id'  => $wallet->id,
+            'type'       => 'deposit',
+            'amount'     => $request->amount,
+            'created_at' => $now,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Deposit successful',
+            'data' => [
+                'wallet_balance' => $wallet->balance,
+                'transaction'    => $transaction,
+            ]
+        ]);
+    }
 }

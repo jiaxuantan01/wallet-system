@@ -72,32 +72,14 @@
             font-size: 12px;
         }
 
-        .amount.income {
+        .amount.deposit,  .amount.rebate{
             color: #16a34a;
             font-weight: 700;
         }
 
-        .amount.expense {
+        .amount.withdrawal {
             color: #dc2626;
             font-weight: 700;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge.income {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .badge.expense {
-            background: #fee2e2;
-            color: #b91c1c;
         }
 
         .actions a {
@@ -106,21 +88,13 @@
             font-weight: 600;
             font-size: 13px;
         }
-
-        .edit {
-            color: #2563eb;
-        }
-
-        .delete {
-            color: #dc2626;
-        }
     </style>
 </head>
 
 <body>
 <div class="page">
     <div class="header">
-        <h1>Transaction List</h1>
+        <h1>Transactions List</h1>
         <a href="#" class="add-btn">+ Add Transaction</a>
     </div>
 
@@ -128,41 +102,27 @@
         <table>
             <thead>
             <tr>
+                <th>ID</th>
                 <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
+                <th>Wallet ID</th>
                 <th>Type</th>
                 <th>Amount</th>
-                <th>Action</th>
             </tr>
             </thead>
 
             <tbody>
             @foreach($transactions as $transaction)
                 <tr>
-                    <td>{{ $transaction['date'] }}</td>
+                    <td>{{ $transaction['id'] }}</td>
 
-                    <td>{{ $transaction['description'] }}</td>
+                    <td>{{ $transaction['created_at'] }}</td>
 
-                    <td>{{ $transaction['category'] }}</td>
+                    <td>{{ $transaction['wallet_id'] }}</td>
 
-                    <td>
-                <span class="badge {{ $transaction['type'] }}">
-                    {{ ucfirst($transaction['type']) }}
-                </span>
-                    </td>
+                    <td>{{ ucfirst($transaction['type']) }}</td>
 
                     <td class="amount {{ $transaction['type'] }}">
-                        @if($transaction['type'] == 'income')
-                            + RM {{ number_format($transaction['amount'], 2) }}
-                        @else
-                            - RM {{ number_format($transaction['amount'], 2) }}
-                        @endif
-                    </td>
-
-                    <td class="actions">
-                        <a href="#" class="edit">Edit</a>
-                        <a href="#" class="delete">Delete</a>
+                        {{ number_format($transaction['amount'], 2) }}
                     </td>
                 </tr>
             @endforeach
