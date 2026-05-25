@@ -96,7 +96,7 @@
 
     <div class="header">
         <h1>Transactions List</h1>
-{{--        <a href="#" class="add-btn">+ Add Transaction</a>--}}
+        <a href="/logout" class="add-btn">Logout</a>
     </div>
 
     <div class="card">

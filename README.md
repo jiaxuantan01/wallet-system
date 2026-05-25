@@ -1,3 +1,9 @@
+# Login Page
+<img src="https://raw.githubusercontent.com/jiaxuantan01/wallet-system/main/public/image/img.png" width="700"/>
+
+# Transaction List
+<img src="https://raw.githubusercontent.com/jiaxuantan01/wallet-system/main/public/image/img_1.png" width="700"/>
+
 Unit tests were implemented to verify:
 
 Deposit functionality
