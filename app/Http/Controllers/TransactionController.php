@@ -107,4 +107,24 @@ class TransactionController extends Controller
             ]);
         });
     }
+
+    public function getbalance(Request $request)
+    {
+        $request->validate([
+            'wallet_id' => 'required|integer',
+        ]);
+
+        $wallet = Wallet::find($request->wallet_id);
+
+        if (!$wallet) {
+            return response()->json([
+                'message' => 'Wallet not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'wallet_id' => $wallet->id,
+            'balance' => number_format($wallet->balance, 2)
+        ]);
+    }
 }

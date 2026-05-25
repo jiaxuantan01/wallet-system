@@ -28,9 +28,4 @@ class Wallet extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
-    public function getBalance($wallet_id){
-
-        return self::where('id', $wallet_id)->balance;
-
-    }
 }
