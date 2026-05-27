@@ -11,13 +11,27 @@ class TransactionController extends Controller
 {
     public function list(Request $request)
     {
-        $transactions = Transaction::with([
+        $query = Transaction::with([
             'wallet.account'
-        ])
-            ->orderBy('created_at', 'desc')
+        ]);
+
+        if ($request->filled('search')) {
+
+            $query->whereHas('wallet.account', function ($q) use ($request) {
+
+                $q->where('username', 'like', '%' . $request->search . '%');
+
+            });
+        }
+
+        $transactions = $query
+            ->orderBy('id', 'desc')
             ->get();
 
-        return view('transactions', compact('transactions'));
+        $totalAmount = $transactions->sum('amount');
+        $totalTransactions = $transactions->count();
+
+        return view('transactions', compact('transactions', 'totalAmount', 'totalTransactions'));
     }
 
     public function deposit(Request $request)
@@ -97,7 +111,7 @@ class TransactionController extends Controller
             Transaction::create([
                 'wallet_id'  => $wallet->id,
                 'type'       => 'withdrawal',
-                'amount'     => $request->amount,
+                'amount'     => $request->amount * -1,
                 'created_at' => $now,
             ]);
 

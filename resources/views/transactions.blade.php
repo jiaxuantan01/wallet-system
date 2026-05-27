@@ -88,6 +88,70 @@
             font-weight: 600;
             font-size: 13px;
         }
+        /* Container spacing */
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        /* Card-like container */
+        .search-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Input group layout */
+        .search-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Input styling */
+        .search-input {
+            flex: 1;
+            height: 42px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        /* Button */
+        .search-btn {
+            height: 42px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 10px;
+            background: #0d6efd;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background: #0b5ed7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-group {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -98,6 +162,30 @@
         <h1>Transactions List</h1>
         <a href="/logout" class="add-btn">Logout</a>
     </div>
+
+    <form method="GET" action="{{ url('/') }}" class="search-form">
+
+        <div class="search-box">
+
+            <div class="search-group">
+
+                <input
+                    type="text"
+                    name="search"
+                    class="search-input"
+                    placeholder="Search members..."
+                    value="{{ request('search') }}"
+                >
+
+                <button class="search-btn">
+                    Search
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
 
     <div class="card">
         <table>
@@ -124,6 +212,13 @@
                 </tr>
             @endforeach
             </tbody>
+
+            <tfoot>
+            <tr style="font-weight: bold; background: #f8f9fa;">
+                <td colspan="5">Total Transactions: {{ $totalTransactions }}</td>
+                <td>Total: {{ number_format($totalAmount, 2) }}</td>
+            </tr>
+            </tfoot>
         </table>
     </div>
 </div>
