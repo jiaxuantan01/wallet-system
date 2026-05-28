@@ -13,6 +13,12 @@ class WalletTest extends TestCase
     public function test_deposit_and_withdraw()
     {
 
+//docker exec -it wallet_app php artisan migrate:fresh --seed
+//docker exec -it wallet_app php artisan test
+//docker compose up -d
+//docker compose down
+//docker logs wallet_app
+
         $wallet = Wallet::find(1);
 
         // deposit
